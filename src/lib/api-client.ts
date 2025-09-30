@@ -10,6 +10,7 @@ import type {
   StatsResponse,
   ErrorResponse,
 } from '../types/api'
+import { logError } from './error-logger'
 
 // API client configuration
 export type APIClientConfig = {
@@ -72,29 +73,35 @@ export const parseAPIError = async (response: Response): Promise<APIError> => {
 
   // Handle 401 Unauthorized
   if (status === 401) {
-    return {
-      type: 'auth',
+    const error = {
+      type: 'auth' as const,
       status,
       message: 'Authentication failed. Please check your credentials.',
     }
+    logError(new Error(error.message), 'authentication', { status })
+    return error
   }
 
   // Try to parse error response body
   try {
     const errorResponse = (await response.json()) as ErrorResponse
-    return {
-      type: status >= 500 ? 'server' : 'client',
+    const error = {
+      type: (status >= 500 ? 'server' : 'client') as 'server' | 'client',
       status,
       message: errorResponse.message || response.statusText,
       details: errorResponse.details,
     }
+    logError(new Error(error.message), 'api', { status, details: error.details })
+    return error
   } catch {
     // Failed to parse JSON error
-    return {
-      type: status >= 500 ? 'server' : 'client',
+    const error = {
+      type: (status >= 500 ? 'server' : 'client') as 'server' | 'client',
       status,
       message: response.statusText || 'Unknown error',
     }
+    logError(new Error(error.message), 'api', { status })
+    return error
   }
 }
 
@@ -159,21 +166,25 @@ export const fetchWithRetry = async <T>(
 
       // Max retries reached
       if (error instanceof Error && error.name === 'AbortError') {
+        const timeoutError = {
+          type: 'timeout' as const,
+          message: `Request timed out after ${timeout}ms`,
+        }
+        logError(new Error(timeoutError.message), 'network', { timeout, url })
         return {
           success: false,
-          error: {
-            type: 'timeout',
-            message: `Request timed out after ${timeout}ms`,
-          },
+          error: timeoutError,
         }
       }
 
+      const networkError = {
+        type: 'network' as const,
+        message: error instanceof Error ? error.message : 'Network error',
+      }
+      logError(error instanceof Error ? error : new Error(networkError.message), 'network', { url })
       return {
         success: false,
-        error: {
-          type: 'network',
-          message: error instanceof Error ? error.message : 'Network error',
-        },
+        error: networkError,
       }
     }
   }

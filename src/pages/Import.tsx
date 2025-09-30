@@ -27,15 +27,15 @@ export const Import: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">データ取り込み</h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 md:mb-6">データ取り込み</h1>
 
       {/* Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-        <h2 className="text-lg font-semibold text-blue-900 mb-3 flex items-center">
-          <span className="text-2xl mr-2">📋</span>
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 md:p-6 mb-4 md:mb-6">
+        <h2 className="text-base md:text-lg font-semibold text-blue-900 mb-3 flex items-center">
+          <span className="text-xl md:text-2xl mr-2">📋</span>
           インポート手順
         </h2>
-        <ol className="list-decimal list-inside space-y-2 text-sm text-blue-800">
+        <ol className="list-decimal list-inside space-y-2 text-xs md:text-sm text-blue-800">
           <li>ぴよログアプリから「データをエクスポート」でCSVファイルを出力</li>
           <li>下のエリアにCSVファイルをドラッグ＆ドロップ、または選択ボタンをクリック</li>
           <li>データが自動的に解析され、ダッシュボードに反映されます</li>
@@ -43,8 +43,8 @@ export const Import: React.FC = () => {
       </div>
 
       {/* File upload */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">CSVファイルを選択</h2>
+      <div className="bg-white rounded-lg shadow p-4 md:p-6 mb-4 md:mb-6">
+        <h2 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">CSVファイルを選択</h2>
         <FileUpload
           onFileSelect={handleFileSelect}
           isLoading={importProgress.isImporting}

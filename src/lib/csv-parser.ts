@@ -3,6 +3,7 @@
 
 import Papa from 'papaparse'
 import type { ActivityType, PiyologRecord } from '../types/database'
+import { logError } from './error-logger'
 
 // CSV parsing result type
 export type CSVParseResult = {
@@ -196,6 +197,10 @@ export const parseCSV = (
         const headerValidation = validateHeaders(results.meta.fields || [])
         if (!headerValidation.valid) {
           errors.push(...headerValidation.errors)
+          logError(new Error('Invalid CSV headers'), 'parse', {
+            filename,
+            errors: headerValidation.errors
+          })
           resolve({
             records: [],
             errors,

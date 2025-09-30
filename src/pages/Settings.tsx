@@ -4,11 +4,11 @@ import { DataManagement } from '../components/DataManagement'
 
 export const Settings: React.FC = () => {
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">設定</h1>
+    <div className="space-y-4 md:space-y-6">
+      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 md:mb-6">設定</h1>
 
       {/* Authentication and password management */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white rounded-lg shadow p-4 md:p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
           <span className="text-2xl mr-2">🔐</span>
           認証・パスワード管理

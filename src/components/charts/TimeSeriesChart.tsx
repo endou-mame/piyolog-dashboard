@@ -25,7 +25,7 @@ const activityLabels: Record<string, string> = {
   hospital: '病院',
 }
 
-export const TimeSeriesChart: React.FC<Props> = ({ records, activityType, height = 300 }) => {
+export const TimeSeriesChart: React.FC<Props> = React.memo(({ records, activityType, height = 300 }) => {
   const chartData = useMemo((): ChartData<'line'> => {
     // Filter by activity type
     const filtered = records.filter((r) => r.activityType === activityType)
@@ -98,4 +98,4 @@ export const TimeSeriesChart: React.FC<Props> = ({ records, activityType, height
       <Line data={chartData} options={options} />
     </div>
   )
-}
+})

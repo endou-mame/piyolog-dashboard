@@ -23,7 +23,7 @@ const activityLabels: Record<string, string> = {
   hospital: '病院',
 }
 
-export const ActivityFrequencyChart: React.FC<Props> = ({ records, height = 300 }) => {
+export const ActivityFrequencyChart: React.FC<Props> = React.memo(({ records, height = 300 }) => {
   const chartData = useMemo((): ChartData<'bar'> => {
     // Count by activity type
     const counts: Record<string, number> = {}
@@ -83,4 +83,4 @@ export const ActivityFrequencyChart: React.FC<Props> = ({ records, height = 300 
       <Bar data={chartData} options={options} />
     </div>
   )
-}
+})

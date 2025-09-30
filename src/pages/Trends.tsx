@@ -7,12 +7,14 @@ import { TimeSeriesChart } from '../components/charts/TimeSeriesChart'
 import { getUniqueActivityTypes, filterByDateRange } from '../lib/analytics/statistics'
 import { analyzeAllTrends, getSignificantTrends } from '../lib/analytics/trends'
 import type { TrendAnalysis } from '../lib/analytics/trends'
+import { useIsMobile } from '../hooks/useMediaQuery'
 
 export const Trends: React.FC = () => {
   const records = useAppStore(selectRecords)
   const filters = useAppStore(selectFilters)
   const setFilters = useAppStore((state) => state.setFilters)
   const resetFilters = useAppStore((state) => state.resetFilters)
+  const isMobile = useIsMobile()
 
   // Apply filters to records
   const filteredRecords = useMemo(() => {
@@ -74,9 +76,9 @@ export const Trends: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">トレンド分析</h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 md:mb-6">トレンド分析</h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
         {/* Filter sidebar */}
         <div className="lg:col-span-1">
           <FilterPanel
@@ -86,15 +88,15 @@ export const Trends: React.FC = () => {
             onReset={resetFilters}
             minDate={dateRange.min}
             maxDate={dateRange.max}
-            isMobile={false}
+            isMobile={isMobile}
           />
         </div>
 
         {/* Main content */}
-        <div className="lg:col-span-3 space-y-6">
+        <div className="lg:col-span-3 space-y-4 md:space-y-6">
           {/* Significant trends summary */}
           {significantTrends.length > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 md:p-6">
               <h2 className="text-lg font-semibold text-blue-900 mb-4 flex items-center">
                 <span className="text-2xl mr-2">💡</span>
                 注目のトレンド
@@ -119,11 +121,11 @@ export const Trends: React.FC = () => {
 
           {/* Time series charts for each activity */}
           {availableActivityTypes.map((activityType) => (
-            <div key={activityType} className="bg-white rounded-lg shadow p-6">
+            <div key={activityType} className="bg-white rounded-lg shadow p-4 md:p-6">
               <TimeSeriesChart
                 records={filteredRecords}
                 activityType={activityType}
-                height={300}
+                height={isMobile ? 250 : 300}
               />
             </div>
           ))}

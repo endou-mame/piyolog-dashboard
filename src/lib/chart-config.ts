@@ -42,6 +42,8 @@ export const defaultChartOptions = {
         font: {
           family: "'Inter', 'Hiragino Sans', sans-serif",
         },
+        padding: 12,
+        usePointStyle: true,
       },
     },
     tooltip: {
@@ -55,12 +57,16 @@ export const defaultChartOptions = {
         size: 13,
       },
       cornerRadius: 4,
+      displayColors: true,
     },
   },
   interaction: {
     mode: 'index' as const,
     intersect: false,
   },
+  // Touch and mobile optimizations
+  events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'],
+  onHover: undefined,
 }
 
 // Color palette for charts

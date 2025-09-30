@@ -34,9 +34,9 @@ export const DataManagement: React.FC = () => {
   }, [records])
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Current data summary */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white rounded-lg shadow p-4 md:p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
           <span className="text-2xl mr-2">📊</span>
           現在のデータ
@@ -64,7 +64,7 @@ export const DataManagement: React.FC = () => {
       </div>
 
       {/* Actions */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white rounded-lg shadow p-4 md:p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
           <span className="text-2xl mr-2">⚙️</span>
           データ操作
@@ -80,7 +80,7 @@ export const DataManagement: React.FC = () => {
             </div>
             <button
               onClick={fetchRecords}
-              className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="ml-4 px-4 py-3 text-sm md:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation"
             >
               🔄 更新
             </button>
@@ -97,7 +97,7 @@ export const DataManagement: React.FC = () => {
             <button
               onClick={() => setShowConfirmDialog(true)}
               disabled={records.length === 0}
-              className="ml-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="ml-4 px-4 py-3 text-sm md:text-base bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
             >
               🗑️ 削除
             </button>
@@ -125,14 +125,14 @@ export const DataManagement: React.FC = () => {
               <button
                 onClick={() => setShowConfirmDialog(false)}
                 disabled={isClearing}
-                className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-3 text-sm md:text-base bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 active:bg-gray-400 transition-colors disabled:opacity-50 touch-manipulation"
               >
                 キャンセル
               </button>
               <button
                 onClick={handleClearData}
                 disabled={isClearing}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-3 text-sm md:text-base bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 touch-manipulation"
               >
                 {isClearing ? '削除中...' : '削除する'}
               </button>

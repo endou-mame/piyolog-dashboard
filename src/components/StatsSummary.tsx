@@ -8,7 +8,7 @@ type Props = {
   records: PiyologRecord[]
 }
 
-export const StatsSummary: React.FC<Props> = ({ records }) => {
+export const StatsSummary: React.FC<Props> = React.memo(({ records }) => {
   const overallStats = useMemo(() => {
     return calculateOverallStatistics(records)
   }, [records])
@@ -135,4 +135,4 @@ export const StatsSummary: React.FC<Props> = ({ records }) => {
       </div>
     </div>
   )
-}
+})

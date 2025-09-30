@@ -11,12 +11,14 @@ import {
   detectAllOutliers,
   generateOutlierInsight,
 } from '../lib/analytics/correlations'
+import { useIsMobile } from '../hooks/useMediaQuery'
 
 export const Correlations: React.FC = () => {
   const records = useAppStore(selectRecords)
   const filters = useAppStore(selectFilters)
   const setFilters = useAppStore((state) => state.setFilters)
   const resetFilters = useAppStore((state) => state.resetFilters)
+  const isMobile = useIsMobile()
 
   // Apply filters to records
   const filteredRecords = useMemo(() => {
@@ -78,9 +80,9 @@ export const Correlations: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">相関分析</h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 md:mb-6">相関分析</h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
         {/* Filter sidebar */}
         <div className="lg:col-span-1">
           <FilterPanel
@@ -90,14 +92,14 @@ export const Correlations: React.FC = () => {
             onReset={resetFilters}
             minDate={dateRange.min}
             maxDate={dateRange.max}
-            isMobile={false}
+            isMobile={isMobile}
           />
         </div>
 
         {/* Main content */}
-        <div className="lg:col-span-3 space-y-6">
+        <div className="lg:col-span-3 space-y-4 md:space-y-6">
           {/* Correlations */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-4 md:p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
               <span className="text-2xl mr-2">🔗</span>
               活動間の相関関係
@@ -141,7 +143,7 @@ export const Correlations: React.FC = () => {
           </div>
 
           {/* Outliers */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-4 md:p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
               <span className="text-2xl mr-2">⚠️</span>
               外れ値・注目イベント

@@ -100,9 +100,9 @@ export const FileUpload: React.FC<Props> = ({
         onDrop={handleDrop}
         onClick={handleButtonClick}
         className={`
-          relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
-          transition-colors duration-200
-          ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}
+          relative border-2 border-dashed rounded-lg p-6 md:p-8 text-center cursor-pointer
+          transition-colors duration-200 touch-manipulation
+          ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400 active:border-blue-400'}
           ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}
         `}
       >
@@ -124,7 +124,7 @@ export const FileUpload: React.FC<Props> = ({
                 <p className="text-sm text-gray-500 mb-4">または</p>
                 <button
                   type="button"
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-3 text-sm md:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                   disabled={isLoading}
                 >
                   ファイルを選択
