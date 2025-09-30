@@ -75,6 +75,17 @@ graph TB
 
 **Steering compliance**: No existing steering documents; this design establishes foundational patterns for future development.
 
+### Implementation Style
+
+**Functional Programming Approach**:
+- **No classes**: All TypeScript code uses functional programming style
+- **Pure functions**: Prefer pure functions with no side effects
+- **Immutable data**: Use immutable data structures and avoid mutations
+- **Function composition**: Build complex logic through composing smaller functions
+- **Type safety**: Leverage TypeScript's type system without relying on OOP patterns
+
+This approach aligns with modern JavaScript/TypeScript best practices and simplifies testing, reasoning about code, and maintaining predictable behavior.
+
 ### Technology Stack and Design Decisions
 
 #### Frontend Layer
