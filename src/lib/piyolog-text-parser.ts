@@ -21,7 +21,7 @@ export type PiyologTextParseError = {
 const HEADER_PATTERN = /^【ぴよログ】(\d{4})年(\d{1,2})月$/
 const DATE_PATTERN = /^(\d{4})\/(\d{1,2})\/(\d{1,2})\([^)]+\)$/
 const CHILD_INFO_PATTERN = /^(.+?)\s+\((\d+)か月(\d+)日\)$/
-const EVENT_PATTERN = /^(\d{1,2}):(\d{2})\s+(.+)$/
+const EVENT_PATTERN = /^(\d{1,2}):(\d{2})\s+(.+?)$/
 const SEPARATOR = '----------'
 
 // Activity type mapping from Japanese to internal type

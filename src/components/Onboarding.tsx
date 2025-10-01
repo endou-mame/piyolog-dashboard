@@ -38,7 +38,7 @@ export const Onboarding: React.FC<Props> = ({ onGetStarted }) => {
             簡単データ取り込み
           </h3>
           <p className="text-sm text-gray-600">
-            ぴよログからエクスポートしたCSVファイルをドラッグ&ドロップするだけ
+            ぴよログからエクスポートしたテキストファイルをドラッグ&ドロップするだけ
           </p>
         </div>
 
@@ -78,7 +78,7 @@ export const Onboarding: React.FC<Props> = ({ onGetStarted }) => {
                 ぴよログからデータをエクスポート
               </h3>
               <p className="text-sm text-gray-600">
-                ぴよログアプリで「設定」→「データをエクスポート」からCSVファイルを出力
+                ぴよログアプリで「設定」→「データをエクスポート」からテキストファイルを出力
               </p>
             </div>
           </div>
@@ -89,7 +89,7 @@ export const Onboarding: React.FC<Props> = ({ onGetStarted }) => {
             </div>
             <div>
               <h3 className="font-semibold text-gray-900 mb-1">
-                CSVファイルをアップロード
+                テキストファイルをアップロード
               </h3>
               <p className="text-sm text-gray-600">
                 「データ取り込み」ページでファイルを選択するかドラッグ&ドロップ

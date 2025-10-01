@@ -11,7 +11,7 @@ type Props = {
 
 export const EmptyState: React.FC<Props> = ({
   title = 'データがありません',
-  message = 'まずはぴよログからエクスポートしたCSVファイルを取り込んでください。',
+  message = 'まずはぴよログからエクスポートしたテキストファイルを取り込んでください。',
   actionLabel = 'データを取り込む',
   onAction,
 }) => {
@@ -47,7 +47,7 @@ export const EmptyState: React.FC<Props> = ({
           <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
             <li>ぴよログアプリを開く</li>
             <li>「設定」→「データをエクスポート」を選択</li>
-            <li>CSV形式でデータを保存</li>
+            <li>テキスト形式でデータを保存</li>
             <li>このダッシュボードの「データ取り込み」ページでファイルをアップロード</li>
           </ol>
         </div>
