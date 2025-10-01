@@ -23,7 +23,7 @@ export type TrendAnalysis = {
 
 // Time series data point
 export type TimeSeriesPoint = {
-  date: Date
+  date: Date | string
   value: number
 }
 
@@ -131,8 +131,9 @@ export const calculateLinearRegression = (data: TimeSeriesPoint[]): LinearRegres
   if (data.length < 2) return null
 
   // Convert dates to numeric values (days since first date)
-  const firstDate = data[0].date.getTime()
-  const x = data.map((p) => (p.date.getTime() - firstDate) / (1000 * 60 * 60 * 24))
+  const dates = data.map((p) => (typeof p.date === 'string' ? new Date(p.date) : p.date))
+  const firstDate = dates[0].getTime()
+  const x = dates.map((d) => (d.getTime() - firstDate) / (1000 * 60 * 60 * 24))
   const y = data.map((p) => p.value)
 
   const n = x.length
@@ -146,14 +147,21 @@ export const calculateLinearRegression = (data: TimeSeriesPoint[]): LinearRegres
   const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX)
   const intercept = (sumY - slope * sumX) / n
 
+  // Check for constant values (no variation)
+  if (isNaN(slope) || !isFinite(slope)) return null
+
   // Calculate R-squared
   const meanY = sumY / n
   const ssTotal = y.reduce((sum, val) => sum + Math.pow(val - meanY, 2), 0)
+
+  // If all values are the same, return null (no trend)
+  if (ssTotal === 0) return null
+
   const ssResidual = y.reduce((sum, val, i) => {
     const predicted = slope * x[i] + intercept
     return sum + Math.pow(val - predicted, 2)
   }, 0)
-  const rSquared = ssTotal === 0 ? 0 : 1 - ssResidual / ssTotal
+  const rSquared = 1 - ssResidual / ssTotal
 
   return {
     slope,
@@ -165,7 +173,7 @@ export const calculateLinearRegression = (data: TimeSeriesPoint[]): LinearRegres
 // Determine trend direction
 export const determineTrendDirection = (
   slope: number,
-  threshold = 0.01
+  threshold = 0.1
 ): TrendDirection => {
   if (Math.abs(slope) < threshold) return 'stable'
   return slope > 0 ? 'increasing' : 'decreasing'
@@ -326,7 +334,12 @@ export const analyzeAllTrends = (
   return trends
 }
 
-// Get significant trends (medium or high significance)
+// Get significant trends (medium or high significance), sorted by significance
 export const getSignificantTrends = (trends: TrendAnalysis[]): TrendAnalysis[] => {
-  return trends.filter((trend) => trend.significance === 'medium' || trend.significance === 'high')
+  return trends
+    .filter((trend) => trend.significance === 'medium' || trend.significance === 'high')
+    .sort((a, b) => {
+      // Sort by confidence (rSquared) descending
+      return b.confidence - a.confidence
+    })
 }

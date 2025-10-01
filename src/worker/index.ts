@@ -24,7 +24,7 @@ app.get('/health', (c) => {
 app.use('/api/*', async (c, next) => {
   const auth = basicAuth({
     username: 'family',
-    password: c.env.DASHBOARD_PASSWORD,
+    password: c.env.DASHBOARD_PASSWORD || 'changeme',
   })
 
   return auth(c, next)
@@ -49,9 +49,14 @@ app.get('/api', (c) => {
   })
 })
 
-// 404 handler
-app.notFound((c) => {
-  return errorResponse(c, 404, 'NOT_FOUND', 'Endpoint not found')
+// Serve static assets and SPA
+// Note: When deployed to Cloudflare Workers with [site] configuration,
+// static files are automatically served from the bucket specified in wrangler.toml
+// This is a fallback for local development
+app.get('*', async (c) => {
+  // For API routes, this won't be reached due to earlier route definitions
+  // For other routes, serve index.html for SPA routing
+  return c.html('<h1>Piyolog Dashboard</h1><p>Static assets served via Cloudflare Workers Site</p>')
 })
 
 // Error handler

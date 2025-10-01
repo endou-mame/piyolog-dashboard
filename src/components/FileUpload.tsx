@@ -10,7 +10,7 @@ type Props = {
 
 export const FileUpload: React.FC<Props> = ({
   onFileSelect,
-  acceptedFormats = ['.csv', 'text/csv'],
+  acceptedFormats = ['.txt', '.csv', 'text/plain', 'text/csv'],
   maxSizeBytes = 10 * 1024 * 1024, // 10MB default
   isLoading = false,
 }) => {
@@ -25,7 +25,7 @@ export const FileUpload: React.FC<Props> = ({
       acceptedFormats.some((format) => file.name.toLowerCase().endsWith(format))
 
     if (!isValidType) {
-      return `ファイル形式が無効です。CSV形式のファイルを選択してください。`
+      return `ファイル形式が無効です。テキストファイル(.txt)またはCSVファイル(.csv)を選択してください。`
     }
 
     // Check file size
@@ -119,7 +119,7 @@ export const FileUpload: React.FC<Props> = ({
             ) : (
               <>
                 <p className="text-lg font-medium mb-2">
-                  {isDragging ? 'ここにドロップ' : 'CSVファイルをドラッグ＆ドロップ'}
+                  {isDragging ? 'ここにドロップ' : 'ぴよログファイルをドラッグ＆ドロップ'}
                 </p>
                 <p className="text-sm text-gray-500 mb-4">または</p>
                 <button
@@ -135,7 +135,7 @@ export const FileUpload: React.FC<Props> = ({
 
           {/* File requirements */}
           <div className="text-xs text-gray-500 space-y-1">
-            <p>対応形式: CSV (.csv)</p>
+            <p>対応形式: テキスト (.txt), CSV (.csv)</p>
             <p>最大サイズ: {(maxSizeBytes / (1024 * 1024)).toFixed(0)}MB</p>
           </div>
         </div>

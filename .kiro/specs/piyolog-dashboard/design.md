@@ -651,10 +651,10 @@ app.get('/api/records', async (c) => {
 
 ### Data Processing Layer
 
-#### CSVParser
+#### PiyologTextParser
 
 **Responsibility & Boundaries**
-- **Primary Responsibility**: Parse PiyoLog CSV exports into structured data objects with validation
+- **Primary Responsibility**: Parse PiyoLog native text format exports into structured data objects with validation
 - **Domain Boundary**: Data transformation layer between file input and domain models
 - **Data Ownership**: Temporary parsing state; outputs immutable domain objects
 - **Transaction Boundary**: Single file parsing operation
@@ -662,75 +662,102 @@ app.get('/api/records', async (c) => {
 **Dependencies**
 - **Inbound**: FileUploadComponent, DataImportService
 - **Outbound**: DataValidator, ErrorLogger
-- **External**: csv-parse library (browser-compatible CSV parser)
+- **External**: None (pure TypeScript implementation using regex patterns)
 
-**External Dependencies Investigation**:
+**Piyolog Text Format Structure**:
 
-**csv-parse (browser build)**:
-- **Version**: 5.x (browser-compatible ESM build)
-- **API**:
-  ```typescript
-  import { parse } from 'csv-parse/browser/esm';
-  const records = parse(csvString, {
-    columns: true, // Use header row for field names
-    skip_empty_lines: true,
-    cast: true // Auto-cast types
-  });
-  ```
-- **Alternative**: PapaParse (more browser-focused, better documentation, similar performance)
-- **Performance**: Handles 10,000 rows in <500ms on modern browsers
-- **Error Handling**: Provides line-level error information for partial import support
+The native Piyolog export format is a structured Japanese text file with the following sections:
+```
+【ぴよログ】2025年4月
+----------
+2025/4/10(木)
+しゅん (0か月0日)
 
-**Requires investigation during implementation**: PiyoLog exact CSV column names and format variations across app versions
+11:25   体重 2.64kg
+11:25   身長 49.0cm
+11:28   体温 36.9°C
+...
+```
+
+**Format Components**:
+- **Header**: `【ぴよログ】YYYY年MM月` - File header with year/month
+- **Date Section**: `YYYY/MM/DD(曜日)` - Date line with day of week
+- **Child Info**: `名前 (Xか月X日)` - Child name and age (skipped during parsing)
+- **Event Line**: `HH:MM   種類 詳細` - Time, activity type, and details
+- **Daily Summary**: `母乳合計`, `ミルク合計`, etc. - Daily totals (skipped during parsing)
+- **Separator**: `----------` - Section separator
+
+**Activity Type Mapping** (Japanese → Internal Type):
+```typescript
+'母乳' → 'feeding'          // Breast milk
+'ミルク' → 'feeding'        // Formula
+'搾母乳' → 'feeding'        // Expressed breast milk
+'睡眠' → 'sleeping'         // Sleep
+'おしっこ' → 'diaper'       // Urine
+'うんち' → 'diaper'         // Bowel movement
+'体重' → 'weight'           // Weight measurement
+'身長' → 'height'           // Height measurement
+'体温' → 'temperature'      // Temperature
+'お風呂' → 'bath'           // Bath
+'病院' → 'hospital'         // Hospital visit
+'くすり' → 'medicine'       // Medicine
+'散歩' → 'walk'             // Walk
+'その他' → 'walk'           // Other (mapped to walk)
+```
+
+**Detail Parsing Patterns**:
+- **Breast Feeding**: `左X分 ▶ 右X分` or `左X分 / 右X分` or `左X分` or `右X分`
+- **Milk/Formula**: `Xml` - Extract quantity in milliliters
+- **Weight**: `X.XXkg` - Extract weight in kilograms
+- **Height**: `X.Xcm` - Extract height in centimeters
+- **Temperature**: `XX.X°C` - Extract temperature in Celsius
 
 **Contract Definition - Service Interface**
 
 ```typescript
-interface CSVParserService {
-  parseCSV(fileContent: string): Result<ParsedData, ParseError[]>;
-  validateFormat(fileContent: string): Result<FormatValidation, ValidationError>;
-  extractMetadata(fileContent: string): FileMetadata;
+interface PiyologTextParseResult {
+  records: Array<Omit<PiyologRecord, 'id'>>;
+  errors: PiyologTextParseError[];
+  totalLines: number;
+  parsedEvents: number;
 }
 
-interface ParsedData {
-  records: PiyologRecord[];
-  metadata: DatasetMetadata;
-  warnings: ParseWarning[];
+interface PiyologTextParseError {
+  line: number;
+  message: string;
+  rawText?: string;
 }
 
 interface PiyologRecord {
   timestamp: Date;
   activityType: ActivityType;
-  duration?: number; // minutes
-  quantity?: number; // ml for feeding
+  duration?: number; // minutes (for feeding, sleeping)
+  quantity?: number; // value with unit (ml, kg, cm, °C)
   notes?: string;
   metadata: RecordMetadata;
 }
 
-interface DatasetMetadata {
-  recordCount: number;
-  dateRange: DateRange;
-  activityTypeCounts: Record<ActivityType, number>;
-  version?: string; // PiyoLog export format version if detectable
-}
+// Main parser function
+function parsePiyologText(
+  textContent: string,
+  filename?: string
+): PiyologTextParseResult;
 
-type Result<T, E> = { success: true; data: T } | { success: false; errors: E };
-
-interface ParseError {
-  line: number;
-  field: string;
-  value: string;
-  reason: string;
-}
-
-interface ParseWarning {
-  line: number;
-  message: string;
-  severity: 'low' | 'medium' | 'high';
-}
+// Helper for error display
+function formatPiyologParseErrors(
+  errors: PiyologTextParseError[]
+): string;
 ```
 
-**Preconditions**: File content is valid UTF-8 text; CSV format follows PiyoLog export structure
+**Implementation Strategy**:
+- **Functional Approach**: Pure functions, no classes
+- **Stateful Parsing**: Track current date context while iterating lines
+- **Regex Patterns**: Compiled patterns for headers, dates, events
+- **Line-by-Line Processing**: Sequential parsing with context tracking
+- **Error Collection**: Non-throwing errors; collect all errors for user feedback
+- **Partial Success**: Return successfully parsed records even with some errors
+
+**Preconditions**: File content is valid UTF-8 text; text format follows Piyolog export structure
 **Postconditions**: Returns parsed records with line-level error information; partial success supported
 **Invariants**: Original file content never modified; parsing errors do not throw exceptions
 

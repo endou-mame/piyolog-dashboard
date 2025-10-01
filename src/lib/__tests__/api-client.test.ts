@@ -41,8 +41,9 @@ describe('API Client', () => {
       const options = createFetchOptions(config)
 
       expect(options.headers).toBeDefined()
-      expect((options.headers as Record<string, string>)['Authorization']).toMatch(/^Basic /)
-      expect((options.headers as Record<string, string>)['Content-Type']).toBe('application/json')
+      const headers = options.headers as Headers
+      expect(headers.get('Authorization')).toMatch(/^Basic /)
+      expect(headers.get('Content-Type')).toBe('application/json')
     })
 
     it('should merge custom headers', () => {
@@ -52,9 +53,9 @@ describe('API Client', () => {
         },
       })
 
-      const headers = options.headers as Record<string, string>
-      expect(headers['Authorization']).toMatch(/^Basic /)
-      expect(headers['X-Custom-Header']).toBe('custom-value')
+      const headers = options.headers as Headers
+      expect(headers.get('Authorization')).toMatch(/^Basic /)
+      expect(headers.get('X-Custom-Header')).toBe('custom-value')
     })
 
     it('should merge custom options', () => {

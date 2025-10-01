@@ -1,13 +1,7 @@
 name = "piyolog-dashboard"
-main = "src/worker/index.ts"
+# SPA mode - serving static assets from dist/ with client-side routing
+main = "workers-site/index.js"
 compatibility_date = "2024-01-01"
-compatibility_flags = ["nodejs_compat"]
-
-# D1 Database binding
-[[d1_databases]]
-binding = "DB"
-database_name = "piyolog-dashboard-db"
-database_id = "" # Will be filled after creating the database
 
 # Static assets configuration
 [site]
@@ -15,4 +9,4 @@ bucket = "./dist"
 
 # Environment variables (secrets should be set via wrangler secret put)
 [vars]
-ENVIRONMENT = "development"
+ENVIRONMENT = "production"

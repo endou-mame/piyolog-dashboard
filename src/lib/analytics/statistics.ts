@@ -12,6 +12,8 @@ export type StatisticsSummary = {
   min: number
   max: number
   stdDev: number
+  q1: number // 25th percentile
+  q3: number // 75th percentile
 }
 
 // Activity statistics type
@@ -72,6 +74,8 @@ export const calculateSummary = (values: number[]): StatisticsSummary | null => 
   const min = Math.min(...values)
   const max = Math.max(...values)
   const stdDev = calculateStdDev(values, mean)
+  const q1 = calculatePercentile(values, 25)
+  const q3 = calculatePercentile(values, 75)
 
   return {
     count: values.length,
@@ -81,6 +85,8 @@ export const calculateSummary = (values: number[]): StatisticsSummary | null => 
     min,
     max,
     stdDev,
+    q1,
+    q3,
   }
 }
 
@@ -147,27 +153,42 @@ export const calculateActivityStatistics = (
   }
 }
 
-// Filter records by date range
+// Filter records by date range (inclusive of both start and end dates)
 export const filterByDateRange = (
   records: PiyologRecord[],
-  startDate?: Date,
-  endDate?: Date
+  startDate?: string | Date,
+  endDate?: string | Date
 ): PiyologRecord[] => {
+  const start = startDate ? (typeof startDate === 'string' ? new Date(startDate) : startDate) : null
+  const end = endDate ? (typeof endDate === 'string' ? new Date(endDate) : endDate) : null
+
+  // Set end date to end of day (23:59:59.999)
+  if (end) {
+    end.setHours(23, 59, 59, 999)
+  }
+
   return records.filter((record) => {
     const timestamp = record.timestamp.getTime()
 
-    if (startDate && timestamp < startDate.getTime()) return false
-    if (endDate && timestamp > endDate.getTime()) return false
+    if (start && timestamp < start.getTime()) return false
+    if (end && timestamp > end.getTime()) return false
 
     return true
   })
 }
 
-// Get all unique activity types from records
+// Get all unique activity types from records (sorted by frequency descending)
 export const getUniqueActivityTypes = (records: PiyologRecord[]): ActivityType[] => {
-  const types = new Set<ActivityType>()
-  records.forEach((record) => types.add(record.activityType))
-  return Array.from(types).sort()
+  const typeCounts = new Map<ActivityType, number>()
+
+  records.forEach((record) => {
+    const count = typeCounts.get(record.activityType) || 0
+    typeCounts.set(record.activityType, count + 1)
+  })
+
+  return Array.from(typeCounts.entries())
+    .sort((a, b) => b[1] - a[1]) // Sort by frequency descending
+    .map(([type]) => type)
 }
 
 // Calculate statistics for all activity types

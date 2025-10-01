@@ -7,6 +7,7 @@ import type { PiyologRecord, ActivityType } from './database'
 export type Bindings = {
   DB: D1Database
   DASHBOARD_PASSWORD: string
+  ENVIRONMENT?: string
 }
 
 // API Request/Response types

@@ -104,30 +104,62 @@ describe('Trends', () => {
   describe('analyzeTrendForFrequency', () => {
     it('should detect increasing frequency trend', () => {
       const records: PiyologRecord[] = [
+        // Day 1: 1 feeding
         createMockRecord('2025-01-15 09:00:00', 'feeding'),
+        // Day 2: 2 feedings
         createMockRecord('2025-01-16 09:00:00', 'feeding'),
         createMockRecord('2025-01-16 14:00:00', 'feeding'),
+        // Day 3: 3 feedings
         createMockRecord('2025-01-17 09:00:00', 'feeding'),
         createMockRecord('2025-01-17 12:00:00', 'feeding'),
         createMockRecord('2025-01-17 15:00:00', 'feeding'),
+        // Day 4: 4 feedings
+        createMockRecord('2025-01-18 09:00:00', 'feeding'),
+        createMockRecord('2025-01-18 12:00:00', 'feeding'),
+        createMockRecord('2025-01-18 15:00:00', 'feeding'),
+        createMockRecord('2025-01-18 18:00:00', 'feeding'),
+        // Day 5: 5 feedings
+        createMockRecord('2025-01-19 09:00:00', 'feeding'),
+        createMockRecord('2025-01-19 11:00:00', 'feeding'),
+        createMockRecord('2025-01-19 13:00:00', 'feeding'),
+        createMockRecord('2025-01-19 15:00:00', 'feeding'),
+        createMockRecord('2025-01-19 17:00:00', 'feeding'),
+        // Day 6: 6 feedings
+        createMockRecord('2025-01-20 09:00:00', 'feeding'),
+        createMockRecord('2025-01-20 11:00:00', 'feeding'),
+        createMockRecord('2025-01-20 13:00:00', 'feeding'),
+        createMockRecord('2025-01-20 15:00:00', 'feeding'),
+        createMockRecord('2025-01-20 17:00:00', 'feeding'),
+        createMockRecord('2025-01-20 19:00:00', 'feeding'),
+        // Day 7: 7 feedings
+        createMockRecord('2025-01-21 09:00:00', 'feeding'),
+        createMockRecord('2025-01-21 11:00:00', 'feeding'),
+        createMockRecord('2025-01-21 13:00:00', 'feeding'),
+        createMockRecord('2025-01-21 15:00:00', 'feeding'),
+        createMockRecord('2025-01-21 17:00:00', 'feeding'),
+        createMockRecord('2025-01-21 19:00:00', 'feeding'),
+        createMockRecord('2025-01-21 21:00:00', 'feeding'),
       ]
 
       const trend = analyzeTrendForFrequency(records, 'feeding')
 
       expect(trend).not.toBeNull()
       expect(trend!.metric).toBe('frequency')
+      expect(trend!.hasEnoughData).toBe(true)
       expect(trend!.direction).toBe('increasing')
-      expect(trend!.slope).toBeGreaterThan(0)
+      expect(trend!.magnitude).toBeGreaterThan(0)
     })
 
-    it('should return null for insufficient data', () => {
+    it('should return stable trend for insufficient data', () => {
       const records: PiyologRecord[] = [
         createMockRecord('2025-01-15 09:00:00', 'feeding'),
       ]
 
       const trend = analyzeTrendForFrequency(records, 'feeding')
 
-      expect(trend).toBeNull()
+      expect(trend).not.toBeNull()
+      expect(trend!.hasEnoughData).toBe(false)
+      expect(trend!.direction).toBe('stable')
     })
   })
 
@@ -157,7 +189,10 @@ describe('Trends', () => {
     it('should handle empty records', () => {
       const trends = analyzeAllTrends([], 'feeding')
 
-      expect(trends).toHaveLength(0)
+      // Even with empty records, frequency trend is always returned
+      expect(trends.length).toBeGreaterThanOrEqual(1)
+      expect(trends[0].metric).toBe('frequency')
+      expect(trends[0].hasEnoughData).toBe(false)
     })
   })
 
@@ -168,23 +203,21 @@ describe('Trends', () => {
           activityType: 'feeding' as const,
           metric: 'frequency' as const,
           direction: 'increasing' as const,
-          slope: 2.5,
-          rSquared: 0.95,
-          startValue: 5,
-          endValue: 15,
-          changePercent: 200,
+          magnitude: 2.5,
+          confidence: 0.95,
+          significance: 'high' as const,
           dataPoints: 5,
+          hasEnoughData: true,
         },
         {
           activityType: 'feeding' as const,
           metric: 'duration' as const,
           direction: 'stable' as const,
-          slope: 0.1,
-          rSquared: 0.3,
-          startValue: 20,
-          endValue: 20.5,
-          changePercent: 2.5,
+          magnitude: 0.1,
+          confidence: 0.3,
+          significance: 'low' as const,
           dataPoints: 5,
+          hasEnoughData: true,
         },
       ]
 
@@ -200,29 +233,27 @@ describe('Trends', () => {
           activityType: 'feeding' as const,
           metric: 'frequency' as const,
           direction: 'increasing' as const,
-          slope: 1.5,
-          rSquared: 0.8,
-          startValue: 5,
-          endValue: 10,
-          changePercent: 100,
+          magnitude: 1.5,
+          confidence: 0.8,
+          significance: 'high' as const,
           dataPoints: 5,
+          hasEnoughData: true,
         },
         {
           activityType: 'sleeping' as const,
           metric: 'duration' as const,
           direction: 'decreasing' as const,
-          slope: -2.0,
-          rSquared: 0.95,
-          startValue: 120,
-          endValue: 80,
-          changePercent: -33,
+          magnitude: -2.0,
+          confidence: 0.95,
+          significance: 'high' as const,
           dataPoints: 5,
+          hasEnoughData: true,
         },
       ]
 
       const significant = getSignificantTrends(trends)
 
-      expect(significant[0].metric).toBe('duration') // Higher rSquared
+      expect(significant[0].metric).toBe('duration') // Higher confidence (0.95 > 0.8)
     })
   })
 })

@@ -154,7 +154,8 @@ describe('Statistics', () => {
 
       const stats = calculateOverallStatistics(records)
 
-      expect(stats.recordsPerDay).toBeCloseTo(1.5, 1) // 3 records over 2 days
+      // 3 records over 3 days (15, 16, 17) = 1 record/day
+      expect(stats.recordsPerDay).toBeCloseTo(1.0, 1)
     })
   })
 
@@ -172,13 +173,13 @@ describe('Statistics', () => {
 
       const feedingStats = stats.find(s => s.activityType === 'feeding')
       expect(feedingStats).toBeDefined()
-      expect(feedingStats?.count).toBe(2)
+      expect(feedingStats?.frequency).toBe(2)
       expect(feedingStats?.duration?.mean).toBeCloseTo(22.5, 1)
       expect(feedingStats?.quantity?.mean).toBeCloseTo(165, 1)
 
       const sleepingStats = stats.find(s => s.activityType === 'sleeping')
       expect(sleepingStats).toBeDefined()
-      expect(sleepingStats?.count).toBe(1)
+      expect(sleepingStats?.frequency).toBe(1)
       expect(sleepingStats?.duration?.mean).toBe(120)
     })
 
@@ -193,7 +194,7 @@ describe('Statistics', () => {
 
       expect(stats).toHaveLength(1)
       const feedingStats = stats[0]
-      expect(feedingStats.count).toBe(3)
+      expect(feedingStats.frequency).toBe(3)
       expect(feedingStats.duration?.mean).toBeCloseTo(25, 1) // (20 + 30) / 2
       expect(feedingStats.quantity?.mean).toBeCloseTo(175, 1) // (150 + 200) / 2
     })
@@ -216,8 +217,8 @@ describe('Statistics', () => {
       const feedingStats = stats[0]
 
       expect(feedingStats.duration?.median).toBe(25)
-      expect(feedingStats.duration?.q1).toBe(15)
-      expect(feedingStats.duration?.q3).toBe(35)
+      expect(feedingStats.duration?.q1).toBeCloseTo(17.5, 1) // Linear interpolation
+      expect(feedingStats.duration?.q3).toBeCloseTo(32.5, 1) // Linear interpolation
     })
   })
 })
